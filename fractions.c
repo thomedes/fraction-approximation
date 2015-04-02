@@ -23,7 +23,7 @@ struct fraction_precision closest_fraction(double x, int steps,
         loop.precision = x == y ? 9999 : -log10((y > x ? y / x : x / y) - 1);
 
         if (loop.precision > best.precision) {
-            if (value(loop) > value(optimum)) {
+            if (callback != NULL && value(loop) > value(optimum)) {
                 steps = (*callback) (optimum = loop);
             }
             best = loop;
@@ -44,7 +44,7 @@ int evaluate(struct fraction_precision f)
 {
     printf("%10d / %-10d => %.10f (%4.1f)\n",
            f.n, f.d, (float) f.n / f.d, f.precision);
-    return steps;
+    return steps;                          /* How many more steps to try */
 }
 
 int main(int argc, char *argv[])
