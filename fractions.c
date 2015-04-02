@@ -30,7 +30,7 @@ struct fraction_precision closest_fraction(double r, int steps,
 #if NAIVE_SLOW_ALGORITHM                   /* Easy to understand */
         (y < x) ? ++loop.n : ++loop.d;
 #else                                      /* harder but MUCH faster */
-        (x > 1) ? loop.n = x * ++loop.d + 0.5 : loop.d = ++loop.n / x + 0.5;
+        (x > 1) ? (loop.n = x * ++loop.d + 0.5) : (loop.d = ++loop.n / x + 0.5);
 #endif
     }
     return best;
