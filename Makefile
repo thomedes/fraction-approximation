@@ -1,7 +1,8 @@
-all: demo
+all: test
 
 fractions: fractions.c
-	$(CC) $< -lm -o $@
+	$(CC) -DTEST=1 $< -lm -o $@
 
-demo: fractions
-	./fractions
+test: fractions
+	./fractions 3.14159265359 1000
+	./fractions 1234.5678 100000
