@@ -5,19 +5,16 @@
 #include <stdlib.h>
 
 #define value(a) (a.precision - log10(a.n + a.d))
-#define fraction(a) ((float) a.n / a.d)
+#define fraction(a) ((double) a.n / a.d)
 
-struct fraction_precision closest_fraction(double x, int steps,
+struct fraction_precision closest_fraction(double r, int steps,
                                            int (*callback) (struct
                                                             fraction_precision))
 {
-    struct fraction_precision loop = { 0, 1, 0 }, best = loop, optimum = loop;
+    const double    x = r > 0 ? r : -r;
+    struct fraction_precision loop = { x, 1, 0 }, best = loop, optimum = loop;
 
-    if (x < 0) {
-        x = -x;
-    }
-
-    for (loop.n = x * ++loop.d; steps--;) {
+    while (steps--) {
         double          y = fraction(loop);
 
         loop.precision = x == y ? 9999 : -log10((y > x ? y / x : x / y) - 1);
