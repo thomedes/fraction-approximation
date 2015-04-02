@@ -11,13 +11,13 @@ struct fraction_precision closest_fraction(double x, int steps,
                                            int (*callback) (struct
                                                             fraction_precision))
 {
-    struct fraction_precision loop = { x, 1, 0 }, best = loop, optimum = loop;
+    struct fraction_precision loop = { 0, 1, 0 }, best = loop, optimum = loop;
 
     if (x < 0) {
         x = -x;
     }
 
-    while (steps--) {
+    for (loop.n = x * ++loop.d; steps--;) {
         double          y = fraction(loop);
 
         loop.precision = x == y ? 9999 : -log10((y > x ? y / x : x / y) - 1);
@@ -28,7 +28,7 @@ struct fraction_precision closest_fraction(double x, int steps,
             }
             best = loop;
         }
-        (y < x) ? ++loop.n : ++loop.d;
+        (y < x) ? ++loop.n : (loop.n = x * ++loop.d);
     }
     return best;
 }
@@ -38,13 +38,14 @@ struct fraction_precision closest_fraction(double x, int steps,
 
 #if TEST
 
-unsigned        steps;
+static unsigned steps;
 
-int evaluate(struct fraction_precision f)
+static int evaluate(struct fraction_precision f)
 {
     printf("%10d / %-10d => %.10f (%4.1f)\n",
            f.n, f.d, (float) f.n / f.d, f.precision);
-    return steps;                          /* How many more steps to try */
+    /* How many more steps to try, return 0 if goog enough */
+    return steps;
 }
 
 int main(int argc, char *argv[])
@@ -52,18 +53,17 @@ int main(int argc, char *argv[])
     struct fraction_precision result;
     double          x;
 
-    if (argc == 3) {
-        sscanf(argv[1], "%lg", &x);
-        sscanf(argv[2], "%u", &steps);
-
-        printf("Computing %f with %u steps limit\n", x, steps);
-        result = closest_fraction(x, steps, &evaluate);
-        printf("Best result:\n");
-        evaluate(result);
-        return EXIT_SUCCESS;
-    } else {
+    if (argc != 3) {
         fprintf(stderr, "Syntax: %s <number> <steps>\n", argv[0]);
         return EXIT_FAILURE;
     }
+    sscanf(argv[1], "%lg", &x);
+    sscanf(argv[2], "%u", &steps);
+
+    printf("Computing %f with %u steps limit\n", x, steps);
+    result = closest_fraction(x, steps, &evaluate);
+    printf("Best result:\n");
+    evaluate(result);
+    return EXIT_SUCCESS;
 }
 #endif                                     /* TEST */

@@ -5,4 +5,4 @@ fractions: fractions.c
 
 test: fractions
 	./fractions 3.14159265359 1000
-	./fractions 1234.5678 100000
+	./fractions 1234.5678 1000
