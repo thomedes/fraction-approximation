@@ -4,7 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define value(a) (a.precision - log10(a.n + a.d))
+#define NAIVE_SLOW_ALGORITHM 0
+
+#define quality(a) (a.precision - log10(a.n + a.d))
 #define fraction(a) ((double) a.n / a.d)
 
 struct fraction_precision closest_fraction(double r, int steps,
@@ -20,12 +22,20 @@ struct fraction_precision closest_fraction(double r, int steps,
         loop.precision = x == y ? 9999 : -log10((y > x ? y / x : x / y) - 1);
 
         if (loop.precision > best.precision) {
-            if (callback != NULL && value(loop) > value(optimum)) {
+            if (callback != NULL && quality(loop) > quality(optimum)) {
                 steps = (*callback) (optimum = loop);
             }
             best = loop;
         }
-        (y < x) ? ++loop.n : (loop.n = x * ++loop.d);
+#if NAIVE_SLOW_ALGORITHM                   /* Easy to understand */
+        (y < x) ? ++loop.n : ++loop.d;
+#else                                      /* harder but MUCH faster */
+        if (x > 1) {
+            loop.n = x * ++loop.d + 0.5;
+        } else {
+            loop.d = ++loop.n / x + 0.5;
+        }
+#endif
     }
     return best;
 }
@@ -41,7 +51,7 @@ static int evaluate(struct fraction_precision f)
 {
     printf("%10d / %-10d => %.10f (%4.1f)\n",
            f.n, f.d, (float) f.n / f.d, f.precision);
-    /* How many more steps to try, return 0 if goog enough */
+    /* How many more steps to try, return 0 if good enough */
     return steps;
 }
 
