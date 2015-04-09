@@ -36,7 +36,7 @@ struct fraction_precision closest_fraction(double r, int steps,
     return best;
 }
 
-#undef value
+#undef quality
 #undef fraction
 
 #if TEST
